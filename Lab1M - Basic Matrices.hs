@@ -19,8 +19,7 @@ customMatrix m n = do
 'zipWith'   :   Ici, zipWith est appliquer sur les listes 'a' et 'b' avec l'operateur d'addition.
                 Cela fait l'operation 'a+b' et recrache (dans une liste) les resultat. -}
 addMatrices :: [[Int]] -> [[Int]] -> [[Int]]
---addMatrices [] [] = []
-addMatrices (a:as) (b:bs) = (zipWith (+) a b) : addMatrices as bs
+addMatrices (a:as) (b:bs) = zipWith (+) a b : addMatrices as bs
 
 
 {- EXPLICATION!!
@@ -34,7 +33,7 @@ transposeMatrix ([]:_) = [] --Definition necessaire pour que la recursion du pro
 transposeMatrix matrix = map head matrix : transposeMatrix (map tail matrix)
 
 
---je sais pas cest quoi le mot en anglais donc voici la seule fonction en francais :)
+--je sais pas cest quoi les mots en anglais pour produit scalaire donc voici la seule fonction en francais :)
 produitScalaire :: [Int] -> [Int] -> Int
 produitScalaire x y = sum (zipWith (*) x y)
 
@@ -45,16 +44,19 @@ smallDeteminant matrix = (w*x) - (y*z)
         [w, x] = matrix!!0
         [y, z] = matrix!!1 
 
+
 multiplyMatrix :: [[Int]] -> [[Int]] -> [[Int]] 
 multiplyMatrix a b = [[ produitScalaire ar bc | bc <- transposeMatrix b ] | ar <- a ] 
 
 
+--retire l'element i d'une liste
 removeCol :: [Int] -> Int -> [Int]
 removeCol (_:as) 0 = as --Si i = 0, garde tout ce qui n'est pas la premiere valeur et return
 removeCol (a:as) i = a : removeCol as (i - 1)   --autrement, garde x, mais refait removeCol (i-1) avec le restant de la liste
                                                 --Somme toute, ca passe a travers la liste 1 element a la fois, de gauche a droite
 
--- Remove col i from all rows of the matrix
+
+--retire une colonne au complet d'une matrice
 removeMultiCol :: [[Int]] -> Int -> [[Int]]
 removeMultiCol [] _ = []
 removeMultiCol (a:as) i = removeCol a i : removeMultiCol as i
@@ -74,16 +76,6 @@ detSum matrix i | len == 1 = fromIntegral $ matrix !! 0 !! 0
                     where
                        currentSumElement = getDetSumElement matrix i
                        len = length matrix
-
-
-userDeterminantMatrix :: IO()
-userDeterminantMatrix = do
-    putStrLn "Entrez l'ordre de la matrice a transposer: "
-    order <- readLn
-    cMatrix <- customMatrix order order
-    let det = detSum cMatrix 0
-    mapM_ print cMatrix
-    print det
 
 
 rangeChecker :: Int -> Int -> IO Int
@@ -111,15 +103,15 @@ userPrefMatrices = do
 
 userAddMatrix :: IO()
 userAddMatrix = do
-    (m1, n1, m2, n2) <- userPrefMatrices
+    (m1, n1, m2, n2) <- userPrefMatrices --Prend la taille des 2 matrices
     putStrLn ""
     uMatrix1 <- customMatrix m1 n1
     mapM_ print uMatrix1
     putStrLn ""
-    uMatrix2 <- customMatrix m2 n2
+    uMatrix2 <- customMatrix m2 n2 --les construits
     mapM_ print uMatrix2
     putStrLn ""
-    let results = addMatrices uMatrix1 uMatrix2
+    let results = addMatrices uMatrix1 uMatrix2 --et les additionnes
     mapM_ print results
 
 
@@ -127,7 +119,9 @@ userTransposeMatrix :: IO()
 userTransposeMatrix = do
     putStrLn "Entrez l'ordre de la matrice a transposer: "
     order <- readLn
-    tMatrix <- transposeMatrix <$> customMatrix order order --magie noir
+    tMatrix <- transposeMatrix <$> customMatrix order order --Le <$> est apparament un 'functor', qui represente 'fmap'
+                                                            --Bon... j'ai AUCUNE idee ca veut dire quoi un functor, mais j'ai trouve ce fix 
+                                                            --la sur StackOverflow, et ca fait que ca fonctionne, donc je questionne pas
     mapM_ print tMatrix
 
 
@@ -135,11 +129,12 @@ userMultiplyMatrices:: IO()
 userMultiplyMatrices = do
     (m1, n1, m2, n2) <- userPrefMatrices
     --print (m1, n1, m2, n2)
-    if n1 /= m2
+    if n1 /= m2 --L'unique facon de faire des if dans Haskell. Semblerait-il que c'est une mauvaise pratique dans cette langue
+                --mais je men fou, donc la voici quand meme
         then do
             putStrLn "\nVeuillez reessayer. Les matrices ne sont pas compatible.\n"
             userMultiplyMatrices
-        else do
+        else do --Le meme code que dans userAddMatrices mis a part 'let results = ...'
             putStrLn ""
             uMatrix1 <- customMatrix m1 n1
             mapM_ print uMatrix1
@@ -151,9 +146,19 @@ userMultiplyMatrices = do
             mapM_ print results
 
 
+userDeterminantMatrix :: IO()
+userDeterminantMatrix = do
+    putStrLn "Entrez l'ordre de la matrice a transposer: "
+    order <- readLn
+    cMatrix <- customMatrix order order
+    let det = detSum cMatrix 0
+    mapM_ print cMatrix
+    print det
 
+
+--Ressemble beaucoup a un switch statetement, mais est techniquement du 'pattern matching'
 userChoice :: Int -> IO()
-userChoice 1 = userAddMatrix
+userChoice 1 = userAddMatrix 
 userChoice 2 = userTransposeMatrix
 userChoice 3 = userMultiplyMatrices
 userChoice 4 = userDeterminantMatrix
@@ -171,5 +176,3 @@ main = do
         \5) - Quitter la console\n"
     choice <- readLn
     userChoice choice
-
-
