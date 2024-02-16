@@ -1,3 +1,8 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use <$>" #-}
+{-# HLINT ignore "Use replicateM" #-}
+{-# HLINT ignore "Redundant return" #-}
+{-# HLINT ignore "Redundant bracket" #-}
 import Data.List -- J'importe les lists[] car cest essentiel et sans les listes, c'est pratiquement impossible a faire en Haskell
 
 
@@ -90,11 +95,11 @@ rangeChecker lowerB upperB = do
 
 userPrefMatrices :: IO (Int, Int, Int, Int)
 userPrefMatrices = do
-    putStrLn "Entrez la longeur de colonne de matrice #1 (1 - 10)"
+    putStrLn "\n\nEntrez la longeur de colonne de matrice #1 (1 - 10)"
     a <- rangeChecker 1 10
     putStrLn "Entrez la longeur de ligne de matrice #1 (1 - 10)"
     b <- rangeChecker 1 10
-    putStrLn "Entrez la longeur de colonne de matrice #2 (1 - 10)"
+    putStrLn "\nEntrez la longeur de colonne de matrice #2 (1 - 10)"
     c <- rangeChecker 1 10
     putStrLn "Entrez la longeur de ligne de matrice #2 (1 - 10)"
     d <- rangeChecker 1 10
@@ -112,16 +117,18 @@ userAddMatrix = do
     mapM_ print uMatrix2
     putStrLn ""
     let results = addMatrices uMatrix1 uMatrix2 --et les additionnes
+    putStrLn "\n Matrice final:"
     mapM_ print results
 
 
 userTransposeMatrix :: IO()
 userTransposeMatrix = do
-    putStrLn "Entrez l'ordre de la matrice a transposer: "
+    putStrLn "\n\nEntrez l'ordre de la matrice a trouver le determinant: "
     order <- readLn
     tMatrix <- transposeMatrix <$> customMatrix order order --Le <$> est apparament un 'functor', qui represente 'fmap'
                                                             --Bon... j'ai AUCUNE idee ca veut dire quoi un functor, mais j'ai trouve ce fix 
                                                             --la sur StackOverflow, et ca fait que ca fonctionne, donc je questionne pas
+    putStrLn "\n\nMatrice final:"
     mapM_ print tMatrix
 
 
@@ -143,6 +150,7 @@ userMultiplyMatrices = do
             mapM_ print uMatrix2
             putStrLn ""
             let results = multiplyMatrix uMatrix1 uMatrix2
+            putStrLn "\n Matrice final:"
             mapM_ print results
 
 
@@ -152,7 +160,9 @@ userDeterminantMatrix = do
     order <- readLn
     cMatrix <- customMatrix order order
     let det = detSum cMatrix 0
+    putStrLn "\n\n Matrice final:"
     mapM_ print cMatrix
+    putStrLn "\n Determinant de la matrice:"
     print det
 
 
