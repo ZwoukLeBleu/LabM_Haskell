@@ -1,8 +1,3 @@
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Use <$>" #-}
-{-# HLINT ignore "Use replicateM" #-}
-{-# HLINT ignore "Redundant return" #-}
-{-# HLINT ignore "Redundant bracket" #-}
 import Data.List -- J'importe les lists[] car cest essentiel et sans les listes, c'est pratiquement impossible a faire en Haskell
 
 
