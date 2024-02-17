@@ -10,7 +10,7 @@ import Data.List -- J'importe les lists[] car cest essentiel et sans les listes,
 'replicate  :   Repete x fois l'action. Dans notre cas, ca repete {ORDRE_MATRICE} fois la fonction qui demande le user input.
                 A chaque repetition, les valeurs sont encapsuler dans une liste.
 'sequence'  :   Place toute les valeurs qui appartient a sa parenthese dans une belle liste toute fraiche. On fini donc avec [[Tnt]]! -}
-customMatrix :: Int -> Int -> IO [[Int]]
+customMatrix ::  Int -> Int -> IO [[Double]]
 customMatrix m n = do
     putStrLn ("Entrez " ++ show n ++ " chiffres separer par des espaces. Appuyer sur [ENTER] pour changer de ligne.")
     let readRow = do
@@ -23,7 +23,7 @@ customMatrix m n = do
 'n:otherNs' :   Le 'a' est la premiere ligne de la premiere matrice. 'as' est toute les autres lignes de cette meme matrice. 
 'zipWith'   :   Ici, zipWith est appliquer sur les listes 'a' et 'b' avec l'operateur d'addition.
                 Cela fait l'operation 'a+b' et recrache (dans une liste) les resultat. -}
-addMatrices :: [[Int]] -> [[Int]] -> [[Int]]
+addMatrices :: [[Double]] -> [[Double]] -> [[Double]]
 addMatrices (a:as) (b:bs) = zipWith (+) a b : addMatrices as bs
 
 
@@ -33,49 +33,49 @@ addMatrices (a:as) (b:bs) = zipWith (+) a b : addMatrices as bs
                 Puisque on a plusieurs listes pour chaque matrices, on prend les elements qui appartient a (1,n) et on les places dans une nouvelle liste 
                 Par exemple, avec [[1, 2], [3, 4]], on ressort [1, 3]. On reitere la fonction, et maintenant on ressort [2, 4].
                 la combinaison des deux listes donne [[1,3], [2,4]], soit la matrice transposer!!!!! -}
-transposeMatrix :: [[Int]] -> [[Int]]
+transposeMatrix :: [[Double]] -> [[Double]]
 transposeMatrix ([]:_) = [] --Definition necessaire pour que la recursion du programme s'arrete quand il ni a plus de colonnes a transposer
 transposeMatrix matrix = map head matrix : transposeMatrix (map tail matrix)
 
 
 --je sais pas cest quoi les mots en anglais pour produit scalaire donc voici la seule fonction en francais :)
-produitScalaire :: [Int] -> [Int] -> Int
+produitScalaire :: [Double] -> [Double] -> Double
 produitScalaire x y = sum (zipWith (*) x y)
 
 
-smallDeteminant :: [[Int]] -> Int
+smallDeteminant :: [[Double]] -> Double
 smallDeteminant matrix = (w*x) - (y*z)
     where 
         [w, x] = matrix!!0
         [y, z] = matrix!!1 
 
 
-multiplyMatrix :: [[Int]] -> [[Int]] -> [[Int]] 
+multiplyMatrix :: [[Double]] -> [[Double]] -> [[Double]] 
 multiplyMatrix a b = [[ produitScalaire ar bc | bc <- transposeMatrix b ] | ar <- a ] 
 
 
 --retire l'element i d'une liste
-removeCol :: [Int] -> Int -> [Int]
+removeCol :: [Double] -> Int -> [Double]
 removeCol (_:as) 0 = as --Si i = 0, garde tout ce qui n'est pas la premiere valeur et return
 removeCol (a:as) i = a : removeCol as (i - 1)   --autrement, garde x, mais refait removeCol (i-1) avec le restant de la liste
                                                 --Somme toute, ca passe a travers la liste 1 element a la fois, de gauche a droite
 
 
 --retire une colonne au complet d'une matrice
-removeMultiCol :: [[Int]] -> Int -> [[Int]]
+removeMultiCol :: [[Double]] -> Int -> [[Double]]
 removeMultiCol [] _ = []
 removeMultiCol (a:as) i = removeCol a i : removeMultiCol as i
 
 
-getDetSumElement :: [[Int]] -> Int -> Int
+getDetSumElement :: [[Double]] -> Int -> Int
 getDetSumElement matrix i = ((-1) ^ i) * element * detSum restOfTheMatrix 0
     where
-        element = fromIntegral $ matrix !! 0 !! i
+        element = round (matrix !! 0 !! i)
         restOfTheMatrix = removeMultiCol (tail matrix) i
 
 
-detSum :: [[Int]] -> Int -> Int
-detSum matrix i | len == 1 = fromIntegral $ matrix !! 0 !! 0
+detSum :: [[Double]] -> Int -> Int
+detSum matrix i | len == 1 = round (matrix !! 0 !! 0)
                 | len == i = 0
                 | otherwise = currentSumElement + detSum matrix (i + 1)
                     where
@@ -123,7 +123,7 @@ userAddMatrix = do
 
 userTransposeMatrix :: IO()
 userTransposeMatrix = do
-    putStrLn "\n\nEntrez l'ordre de la matrice a trouver le determinant: "
+    putStrLn "\n\nEntrez l'ordre de la matrice a transposer: "
     order <- readLn
     tMatrix <- transposeMatrix <$> customMatrix order order --Le <$> est apparament un 'functor', qui represente 'fmap'
                                                             --Bon... j'ai AUCUNE idee ca veut dire quoi un functor, mais j'ai trouve ce fix 
